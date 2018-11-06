@@ -166,3 +166,44 @@ function deshadownode(){
         return "#0e4677";
        })
 }
+function duplicatebranches(draggedNode,d){
+  var childcount=0;
+  if (typeof draggedNode.children !='undefined')
+       childcount = draggedNode.children.length
+     
+     if (childcount > 0) {//add children of dragged node to the children of d node
+         for (j =0 ; j<childcount;j++){
+           addtochildren(d,draggedNode.children[0])
+         }
+         var copysubtree=clonetree(d, draggedNode.depth, draggedNode.height);
+         console.log("copysubtree")
+         console.log(copysubtree)
+         copysubtree.children.forEach(function(f){
+         f.parent=draggedNode;
+            if (typeof draggedNode.children !== 'undefined') {
+                 draggedNode.children.push(f);
+             } else {
+                 draggedNode.children=[];
+                 draggedNode.data.children=[];
+                 draggedNode.children.push(f);
+             }
+             draggedNode.data.children.push(f.data);
+         })
+  }
+   draggedNode.data.name= d.data.name+"&" + draggedNode.data.name;
+
+  
+   d.data.name= draggedNode.data.name;
+  
+   
+   d3.selectAll('.copys').remove();
+   //removelink(draggedNode);
+   //removedraggedNode(draggedNode)
+   //console.log(root)
+  // transformNode(draggedNode,originalX,originalY);
+  // updatealltext();
+   deshadownode();
+  // console.log(root);
+   update(draggedNode);
+   updatealltext();
+}

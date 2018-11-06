@@ -57,3 +57,9 @@
     position: relative;
     font-size: 1em;
 }
+.ui-button-text {
+   font-size: inherit !important;
+}
+.small-button {
+   font-size: .8em !important;
+}

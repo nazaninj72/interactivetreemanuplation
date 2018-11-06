@@ -62,8 +62,10 @@ root = d3.hierarchy(data, function(d) {
 });
 root.x0 = height / 2;
 root.y0 = 0;
-
+var constantroot=root;
 update(root);
+var treechanges=[];
+treechanges.push(constantroot)
 
 //var selected = null;
 
@@ -235,6 +237,16 @@ function update(source) {
   
 }
 $(function() {
+ $("#undobutton").click(function(){
+  if (treechanges.length!=0){
+      treechanges.pop()
+      console.log(treechanges[treechanges.length-1])
+      update(treechanges[treechanges.length-1])  
+  }           
+})
+})
+
+$(function() {
     $( "#dialog-1" ).dialog({
        autoOpen: false,  
     });
@@ -268,8 +280,7 @@ function dragstarted(d) {
                     .attr("cy",draggingNode.x)
   originalX=draggingNode.y;
   originalY=draggingNode.x;
-  console.log(originalX)
-  console.log(originalY)
+
        //creating shadowi image of dragging node
   d3.select(this).append("circle")
     .attr('r', 10).style("fill","lightblue")  
@@ -293,9 +304,11 @@ function dragended(d) {
   svg.selectAll('g.node')
     .filter(function(d, i) {
       if(distance(draggedNode.x,draggedNode.y, d.x, d.y) < 20 && draggedNode!=d){
+
                   //should check the cases in here
           if (draggedNode.parent==d.parent && d.depth==draggedNode.depth) //same level same branch
           {
+            console.log(treechanges[0])
             if (typeof draggedNode.children !='undefined')
               childcount = draggedNode.children.length
             
@@ -314,58 +327,32 @@ function dragended(d) {
                removelink(draggedNode);
                updatealltext();
                removedraggedNode(draggedNode)
+              
+             //  console.log(root)
+               treechanges.push(root)
           
           }//check for case1
           else if (draggedNode.parent!=d.parent && d.depth==draggedNode.depth){//same level different branch
                               
                         $( "#dialog-1" ).dialog( "open" );
+                        $("#firstbutton").mouseenter(function(){
+
+                          
+
+                        })
+                        $("#firstbutton").mouseleave(function(){
+
+
+
+                        })
+
                          $("#firstbutton").click(function(){// create copy of nodes in each branch
                             //close dialog box first then
                               console.log(draggedNode.depth + "," + draggedNode.height)
                               $( "#dialog-1" ).dialog( "close" );
-                               if (typeof draggedNode.children !='undefined')
-                                 childcount = draggedNode.children.length
-                               
-                               if (childcount > 0) {//add children of dragged node to the children of d node
-                                   for (j =0 ; j<childcount;j++){
-                                     addtochildren(d,draggedNode.children[0])
-                                   }
-                                   var copysubtree=clonetree(d, draggedNode.depth, draggedNode.height);
-                                   console.log("copysubtree")
-                                   console.log(copysubtree)
-                                   copysubtree.children.forEach(function(f){
-                                   f.parent=draggedNode;
-                                      if (typeof draggedNode.children !== 'undefined') {
-                                           draggedNode.children.push(f);
-                                       } else {
-                                           draggedNode.children=[];
-                                           draggedNode.data.children=[];
-                                           draggedNode.children.push(f);
-                                       }
-                                       draggedNode.data.children.push(f.data);
-                                   })
-                                 }
+                                  duplicatebranches(draggedNode,d)
                             
-
-
-
-                             
-                              draggedNode.data.name= d.data.name+"&" + draggedNode.data.name;
-
-                             
-                              d.data.name= draggedNode.data.name;
-                           
                               
-                              d3.selectAll('.copys').remove();
-                              //removelink(draggedNode);
-                              //removedraggedNode(draggedNode)
-                              //console.log(root)
-                             // transformNode(draggedNode,originalX,originalY);
-                             // updatealltext();
-                              deshadownode();
-                             // console.log(root);
-                              update(draggedNode);
-                              updatealltext();
                               
                              
                          });
@@ -467,7 +454,7 @@ function dragended(d) {
     } 
     return true
   }//check for distance
-  /*else if(draggedNode!=d && distFromLine(draggedNode.x,draggedNode.y,d)<=30) {
+  else if(draggedNode!=d && distFromLine(draggedNode.x,draggedNode.y,d)<=30) {
 
         $( "#linedialog" ).dialog( "open" );
          $("#linebutton1").click(function(){
@@ -482,7 +469,7 @@ function dragended(d) {
          console.log(d)
         
         return true
-      }*/else{
+      }else{
         return false
       }
 
