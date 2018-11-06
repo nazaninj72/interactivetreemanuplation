@@ -118,3 +118,51 @@ function deshadownode(){
                           return "#0e4677";
                         })
 }
+function distFromLine(x,y,d){
+  var x1;
+  var y1;
+  var x2;
+  var y2;
+  if (d.parent==null)//root of the tree
+  {
+    x1= root.x0
+     y1=0;
+   }else{
+     x1 = d.parent.x;
+     y1 = d.parent.y;
+   }
+   x2= d.x;
+   y2 = d.y;
+   
+   if ((x2-x1) ==0){//this should be worked on later
+    
+      return  (Math.abs(x-x1))
+    
+   }else {
+    var m = (y2-y1)/(x2-x1)
+    var A = (-1) * m;
+    console.log(m)
+    var b = y1-(m*x1)
+    var C = (-1) * b;
+    var B = 1;
+    return (Math.abs(A*x + B*y +C)/(Math.sqrt(Math.pow(A,2)+Math.pow(B,2))))
+   }
+
+}
+function transformNode(draggedNode,originalX,originalY){
+  draggedNode.x=originalX;
+  draggedNode.y=originalY;
+  svg.selectAll('g.node').filter(function (d,i){
+    if (d == draggedNode){
+      return true;
+    }
+    return false;
+    
+  }).attr("transform", "translate(" + originalX + "," + originalY + ")");
+}
+function deshadownode(){
+  svg.selectAll('g.node').append("circle")
+        .attr('r', 10).style("fill", function(d) {
+        return "#0e4677";
+       })
+}

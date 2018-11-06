@@ -111,7 +111,7 @@ function update(source) {
     }).
     attr('y2', function(d) {
     	return source.x0;
-    });
+    })
     
   var linkUpdate = linkEnter.merge(link);
   
@@ -246,6 +246,12 @@ $(function() {
     });
     $
  });
+      $(function() {
+    $( "#linedialog" ).dialog({
+       autoOpen: false,  
+    });
+    $
+ });
 var originalX=null;
 var originalY=null;
 function dragstarted(d) {
@@ -260,8 +266,10 @@ function dragstarted(d) {
                     .style("stroke-width","3px")
                     .attr("cx",draggingNode.y)
                     .attr("cy",draggingNode.x)
-      originalX=draggingNode.x;
-      originalY=draggingNode.y;
+  originalX=draggingNode.y;
+  originalY=draggingNode.x;
+  console.log(originalX)
+  console.log(originalY)
        //creating shadowi image of dragging node
   d3.select(this).append("circle")
     .attr('r', 10).style("fill","lightblue")  
@@ -279,7 +287,7 @@ function dragged(d) {
 
                          
 function dragended(d) {
-  var f = false;
+  var first = false;
   draggedNode=d;
   var childcount =0;
   svg.selectAll('g.node')
@@ -319,29 +327,26 @@ function dragended(d) {
                                  childcount = draggedNode.children.length
                                
                                if (childcount > 0) {//add children of dragged node to the children of d node
-                                 
                                    for (j =0 ; j<childcount;j++){
-                                     //console.log(j)
                                      addtochildren(d,draggedNode.children[0])
-
                                    }
+                                   var copysubtree=clonetree(d, draggedNode.depth, draggedNode.height);
+                                   console.log("copysubtree")
+                                   console.log(copysubtree)
+                                   copysubtree.children.forEach(function(f){
+                                   f.parent=draggedNode;
+                                      if (typeof draggedNode.children !== 'undefined') {
+                                           draggedNode.children.push(f);
+                                       } else {
+                                           draggedNode.children=[];
+                                           draggedNode.data.children=[];
+                                           draggedNode.children.push(f);
+                                       }
+                                       draggedNode.data.children.push(f.data);
+                                   })
                                  }
-                             console.log(draggedNode.depth + "," + draggedNode.height)
-                            console.log(d)
-                             var copysubtree=clonetree(d, draggedNode.depth, draggedNode.height);
-                             console.log("copysubtree")
-                             console.log(copysubtree)
-                             copysubtree.children.forEach(function(f){
-                             f.parent=draggedNode;
-                                if (typeof draggedNode.children !== 'undefined') {
-                                     draggedNode.children.push(f);
-                                 } else {
-                                     draggedNode.children=[];
-                                     draggedNode.data.children=[];
-                                     draggedNode.children.push(f);
-                                 }
-                                 draggedNode.data.children.push(f.data);
-                             })
+                            
+
 
 
                              
@@ -387,12 +392,8 @@ function dragended(d) {
                           removedraggedNode(draggedNode) 
                         });
          }//secondcase
-         else if (draggedNode.parent!=d.parent && d.depth!=draggedNode.depth &&draggedNode.parent!=d){//different level different branch
-          if (d.parent==draggedNode){//swap draggednode and d
-              var temp = draggedNode;
-              d= temp;
-              draggedNode=d;
-          }
+         else if (draggedNode.parent!=d.parent && d.depth!=draggedNode.depth &&draggedNode.parent!=d && d.parent!=draggedNode){//different level different branch
+          
            
              $( "#dialog-2" ).dialog( "open" );
              $("#firstbutton2").click(function(){//merge without adding to children
@@ -442,14 +443,53 @@ function dragended(d) {
           removelink(draggedNode);
           updatealltext();
           removedraggedNode(draggedNode)
-    } //forthcase 
-    return true;
+    } //forthcase
+    else if (draggedNode.parent!=d.parent && d.depth!=draggedNode.depth &&draggedNode==d.parent){
+          if (typeof d.children !='undefined')
+            childcount = d.children.length
+          
+          if (childcount > 0) {//add children of dragged node to the children of d node
+            
+              for (j =0 ; j<childcount;j++){
+              
+                addtochildren(draggedNode,d.children[0])
+              }
+          }else{
+            transformNode(draggedNode,originalX,originalY)
+
+          }
+          draggedNode.data.name= d.data.name +"&" +draggedNode.data.name; 
+          d3.selectAll('.copys').remove();
+          removelink(d);
+          updatealltext();
+          removedraggedNode(d)
+          deshadownode()
+    } 
+    return true
   }//check for distance
-  else{
-    return false;
-  }
-  
+  /*else if(draggedNode!=d && distFromLine(draggedNode.x,draggedNode.y,d)<=30) {
+
+        $( "#linedialog" ).dialog( "open" );
+         $("#linebutton1").click(function(){
+
+
+         })//linebutton1
+
+         $("#linebutton2").click(function(){
+
+
+         })
+         console.log(d)
+        
+        return true
+      }*/else{
+        return false
+      }
 
 })
+console.log(draggedNode.x)
+console.log(draggedNode.y)
+
+
   d3.select(this).classed("active", false);
 }
