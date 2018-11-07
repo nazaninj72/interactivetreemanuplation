@@ -3,6 +3,9 @@
   stroke: steelblue;
   stroke-width: 3px;
 }
+.fadedCircle{
+  display: none;
+}
 
 .node text {
   font: 12px sans-serif;

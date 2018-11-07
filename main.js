@@ -69,12 +69,12 @@ root.y0 = 0;
   rootdouble=clonetree(root, root.depth, root.height)
   treechanges.push(rootdouble)
   treechanges.push(rootdouble)
-  console.log(rootdouble)
-update(root);
+ // console.log(rootdouble)
+  update(root);
 
 
 //var selected = null;
-
+var node;
 function update(source) {
 
   // Assigns the x and y position for the nodes
@@ -175,7 +175,7 @@ function update(source) {
 	// ### CIRCLES
 
   // Update the nodes...
-  var node = svg.selectAll('g.node')
+    node = svg.selectAll('g.node')
   	.data(nodes, function(d) {
     	return d.id || (d.id = ++i);
     });
@@ -242,19 +242,26 @@ function update(source) {
  
   
 }
+
+/* UNDO OPTION*/
 $(function() {
  $("#undobutton").click(function(){
-  if (treechanges.length>1){
+  if (treechanges.length<=2){
+     $(this).prop("disabled",true);
+     
+  }else{
+    $(this).prop("disabled",false);
     console.log(treechanges.length)
       treechanges.pop()
-      console.log(treechanges.length)
-      console.log(treechanges[treechanges.length-1])
-      root=treechanges[treechanges.length-1];
+     // console.log(treechanges.length)
+     // console.log(treechanges[treechanges.length-1])
+      root=clonetree(treechanges[treechanges.length-1],treechanges[treechanges.length-1].depth,treechanges[treechanges.length-1].height);
       root.x0 = height / 2;
       root.y0 = 0;
-      console.log(root)
-      update(root)  
-  }           
+      //console.log(root)
+      update(root) 
+
+  }          
 })
 })
 
@@ -339,23 +346,39 @@ function dragended(d) {
                removelink(draggedNode);
                updatealltext();
                removedraggedNode(draggedNode)
-              
-               console.log(clonetree(root,root.depth,root.height))
+               
+              // console.log(clonetree(root,root.depth,root.height))
                treechanges.push(clonetree(root,root.depth,root.height))
-               console.log(treechanges.length)
+             //  console.log(treechanges.length)
           
           }//check for case1
           else if (draggedNode.parent!=d.parent && d.depth==draggedNode.depth){//same level different branch
                               
                         $( "#dialog-1" ).dialog( "open" );
                         $("#firstbutton").mouseenter(function(){
+                         
+                          svg.selectAll('g.node').filter(function (f,i){
+                            if (f==draggedNode || f==d){
 
-                          
+                              return false
+                            }else{
+                              return true
+                            }
+                          }).append("circle")
+                                  .attr('r', 10).style("fill", function(d) {
+                                      return "#D3D3D3";
+                                    }).style("stroke",function(d) {
+                                      return "#D3D3D3";
+                                    })
+
 
                         })
                         $("#firstbutton").mouseleave(function(){
 
-
+                          svg.selectAll('g.node').append("circle")
+                                                          .attr('r', 10).style("fill", function(d) {
+                                                    return "#0e4677";
+                                                  })
 
                         })
 
@@ -487,6 +510,7 @@ function dragended(d) {
           addtochildren(draggedNode,d)
           deshadownode()
            d3.selectAll('.copys').remove();
+           treechanges.push(clonetree(root,root.depth,root.height))
 
         })
      $("#linebutton2").click(function(){
@@ -494,9 +518,10 @@ function dragended(d) {
       addtochildren(d.parent,draggedNode)
       deshadownode()
       d3.selectAll('.copys').remove();
+      treechanges.push(clonetree(root,root.depth,root.height))
      })
 
-      console.log(d)
+     // console.log(d)
       return true
     }else{
       return false

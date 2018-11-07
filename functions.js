@@ -10,7 +10,7 @@ function addtochildren(d,f){
    f.parent.children.splice(index, 1);
    f.parent.data.children.splice(index, 1);
  }
- console.log(f.parent.children.length)
+ //console.log(f.parent.children.length)
  if (f.parent.children.length == 0)
  {
   delete f.parent.children
