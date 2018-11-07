@@ -65,12 +65,11 @@ function removedraggedNode(f){
 function clonetree(root, depth, height){
 
   var cloneroot=clonenode(root, typeof root.children=='undefined', depth, height)
-  console.log(cloneroot)
+ 
 
   if (typeof root.children!='undefined'){
    // console.log("entered here")
-   console.log("root.children length")
-   console.log(root.children.length)
+ 
     root.children.forEach(function(f){
       var newNode=clonetree(f, depth + 1, height - 1)
      //console.log("newnode")
@@ -118,11 +117,12 @@ function deshadownode(){
                           return "#0e4677";
                         })
 }
-function distFromLine(x,y,d){
+function isNearLine(x,y,d){
   var x1;
   var y1;
   var x2;
   var y2;
+  threshold= 1100
   if (d.parent==null)//root of the tree
   {
     x1= root.x0
@@ -133,20 +133,39 @@ function distFromLine(x,y,d){
    }
    x2= d.x;
    y2 = d.y;
+   if (d.parent.x == x && d.parent.y==y)
+    return false
    
-   if ((x2-x1) ==0){//this should be worked on later
-    
-      return  (Math.abs(x-x1))
-    
-   }else {
-    var m = (y2-y1)/(x2-x1)
-    var A = (-1) * m;
-    console.log(m)
-    var b = y1-(m*x1)
-    var C = (-1) * b;
-    var B = 1;
-    return (Math.abs(A*x + B*y +C)/(Math.sqrt(Math.pow(A,2)+Math.pow(B,2))))
-   }
+   dxc = x - x1;
+  // console.log("dxc")
+  // console.log(dxc)
+   dyc = y-y1;
+  // console.log("dyc")
+  // console.log(dyc)
+   dxl = x2-x1;
+   dyl = y2-y1;
+  /* console.log("dxl")
+   console.log(dxl)
+   console.log("dyl")
+   console.log(dyl)*/
+
+   cross = (dxc * dyl) - (dyc * dxl);
+  // console.log("cross")
+  // console.log(cross)
+   if (Math.abs(cross) >=threshold)
+    return false;
+  if (Math.abs(dxl) >= Math.abs(dyl))
+    if (dxl>0 ){
+      return x1<=x && x<=x2
+    }else{
+      return x2<=x && x<=x1
+    }
+  else
+    if (dyl > 0)  
+     return  y1 <= y && y <= y2 
+   else
+     return y2 <= y && y <= y1;
+   
 
 }
 function transformNode(draggedNode,originalX,originalY){

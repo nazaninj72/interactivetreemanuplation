@@ -38,7 +38,7 @@ var data =
 
 // Set the dimensions and margins of the diagram
 var margin = {top: 20, right: 90, bottom: 30, left: 90},
-	width = 960 - margin.left - margin.right,
+	width = 1060 - margin.left - margin.right,
   height = 500 - margin.top - margin.bottom;
 
 // append the svg object to the body of the page
@@ -55,6 +55,7 @@ var i = 0, duration = 750, root;
 
 // declares a tree layout and assigns the size
 var treemap = d3.tree().size([height, width]);
+var treechanges=[];
 
 // Assigns parent, children, height, depth
 root = d3.hierarchy(data, function(d) {
@@ -62,10 +63,15 @@ root = d3.hierarchy(data, function(d) {
 });
 root.x0 = height / 2;
 root.y0 = 0;
-var constantroot=root;
+
+
+  var rootdouble;
+  rootdouble=clonetree(root, root.depth, root.height)
+  treechanges.push(rootdouble)
+  treechanges.push(rootdouble)
+  console.log(rootdouble)
 update(root);
-var treechanges=[];
-treechanges.push(constantroot)
+
 
 //var selected = null;
 
@@ -238,10 +244,16 @@ function update(source) {
 }
 $(function() {
  $("#undobutton").click(function(){
-  if (treechanges.length!=0){
+  if (treechanges.length>1){
+    console.log(treechanges.length)
       treechanges.pop()
+      console.log(treechanges.length)
       console.log(treechanges[treechanges.length-1])
-      update(treechanges[treechanges.length-1])  
+      root=treechanges[treechanges.length-1];
+      root.x0 = height / 2;
+      root.y0 = 0;
+      console.log(root)
+      update(root)  
   }           
 })
 })
@@ -308,7 +320,7 @@ function dragended(d) {
                   //should check the cases in here
           if (draggedNode.parent==d.parent && d.depth==draggedNode.depth) //same level same branch
           {
-            console.log(treechanges[0])
+           // console.log(treechanges[0])
             if (typeof draggedNode.children !='undefined')
               childcount = draggedNode.children.length
             
@@ -328,8 +340,9 @@ function dragended(d) {
                updatealltext();
                removedraggedNode(draggedNode)
               
-             //  console.log(root)
-               treechanges.push(root)
+               console.log(clonetree(root,root.depth,root.height))
+               treechanges.push(clonetree(root,root.depth,root.height))
+               console.log(treechanges.length)
           
           }//check for case1
           else if (draggedNode.parent!=d.parent && d.depth==draggedNode.depth){//same level different branch
@@ -351,6 +364,7 @@ function dragended(d) {
                               console.log(draggedNode.depth + "," + draggedNode.height)
                               $( "#dialog-1" ).dialog( "close" );
                                   duplicatebranches(draggedNode,d)
+                                  treechanges.push(clonetree(root,root.depth,root.height))
                             
                               
                               
@@ -376,7 +390,8 @@ function dragended(d) {
                           d3.selectAll('.copys').remove();
                           removelink(draggedNode);
                           updatealltext();
-                          removedraggedNode(draggedNode) 
+                          removedraggedNode(draggedNode)
+                          treechanges.push(clonetree(root,root.depth,root.height)) 
                         });
          }//secondcase
          else if (draggedNode.parent!=d.parent && d.depth!=draggedNode.depth &&draggedNode.parent!=d && d.parent!=draggedNode){//different level different branch
@@ -401,6 +416,7 @@ function dragended(d) {
                  removelink(draggedNode);
                  updatealltext();
                  removedraggedNode(draggedNode)
+                 treechanges.push(clonetree(root,root.depth,root.height))
              });
              $("#secondbutton2").click(function(){//add the dragged node to the children of the parent node
                  $( "#dialog-2" ).dialog( "close" );
@@ -410,6 +426,7 @@ function dragended(d) {
                 // console.log(draggedNode.parent.children)
                 addtochildren(d,draggedNode)
                 deshadownode(draggedNode)
+                treechanges.push(clonetree(root,root.depth,root.height))
             
              });
      }//thirdcase
@@ -430,6 +447,7 @@ function dragended(d) {
           removelink(draggedNode);
           updatealltext();
           removedraggedNode(draggedNode)
+          treechanges.push(clonetree(root,root.depth,root.height))
     } //forthcase
     else if (draggedNode.parent!=d.parent && d.depth!=draggedNode.depth &&draggedNode==d.parent){
           if (typeof d.children !='undefined')
@@ -451,31 +469,40 @@ function dragended(d) {
           updatealltext();
           removedraggedNode(d)
           deshadownode()
+          treechanges.push(clonetree(root,root.depth,root.height))
     } 
     return true
   }//check for distance
-  else if(draggedNode!=d && distFromLine(draggedNode.x,draggedNode.y,d)<=30) {
+  else{
+    return false
+  }
 
-        $( "#linedialog" ).dialog( "open" );
-         $("#linebutton1").click(function(){
+ })  
+  svg.selectAll('line.link').filter(function(d,i){
+    if (draggedNode!=d && isNearLine(draggedNode.x,draggedNode.y,d)){
+      $( "#linedialog" ).dialog( "open" );
+      $("#linebutton1").click(function(){//adding in the middle of the link
+          $( "#linedialog" ).dialog( "close" );
+          addtochildren(d.parent,draggedNode)
+          addtochildren(draggedNode,d)
+          deshadownode()
+           d3.selectAll('.copys').remove();
 
+        })
+     $("#linebutton2").click(function(){
+      $( "#linedialog" ).dialog( "close" );
+      addtochildren(d.parent,draggedNode)
+      deshadownode()
+      d3.selectAll('.copys').remove();
+     })
 
-         })//linebutton1
-
-         $("#linebutton2").click(function(){
-
-
-         })
-         console.log(d)
-        
-        return true
-      }else{
-        return false
-      }
+      console.log(d)
+      return true
+    }else{
+      return false
+    }
 
 })
-console.log(draggedNode.x)
-console.log(draggedNode.y)
 
 
   d3.select(this).classed("active", false);
