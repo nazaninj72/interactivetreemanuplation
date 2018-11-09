@@ -11,26 +11,21 @@
 <body>
 
 <!-- load the d3.js library -->
-<script src="functions.js"></script>  
-<script src="main.js"></script>
-
-<div id="undooption">
-	<input type="button" id="undobutton" value="undo">
-</div>
+<script src="multipletreesfunctions.js"></script>  
+<script src="multipletrees.js"></script>
 <div id="dialog-1" class="ui-dialog-content ui-widget-content" " title = "Please choose">
     <button class="ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all" id="firstbutton">
    <span class="ui-button-text">copy node in each branch</span>
 </button>
      <input type="button" id="secondbutton" name="second" value="Merge with this node in dropping point" />
    </div>
-   <div id = "dialog-2" 
-     title = "Please choose">
-     <input type="button" id="firstbutton2" name="first" value="Merge with this node" />
-     <input type="button" id="secondbutton2" name="second" value="Add node to the children of this node" />
-   </div>
    <div id = "linedialog" 
      title = "Please choose">
      <input type="button" id="linebutton1" name="first" value="add in the middle of two nodes" />
      <input type="button" id="linebutton2" name="second" value="Add node to the children of this node" />
    </div>
+<div id="undooption">
+	<input type="button" id="undobutton" value="undo">
+</div>
+
 </body>
