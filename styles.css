@@ -37,7 +37,6 @@
     left: 0;
     outline: 0 none;
     padding: 0 !important;
-    position: absolute;
     top: 0;
 }
 .ui-dialog .ui-dialog-content {
@@ -65,4 +64,95 @@
 }
 .small-button {
    font-size: .8em !important;
+}
+.container {
+    width: 100%;
+    height: 600px;
+    margin: auto;
+    padding: 10px;
+}
+.tree {
+    width: 75%;
+    height: 600px;
+    float: left;
+}
+.recomwindow {
+    width: 25%;
+    height: 600px;
+    float: right;
+}
+.dialogbox {
+    
+    background-color: lightgrey;
+    width: 300px;
+    border: 2px solid #0d0d0d;
+    font-family: Arial;
+    margin-top: 100px;
+    margin-right: 50px;
+    background:#fff;
+
+}
+#dialogbox1{
+  display: none;
+}
+#dialogbox2{
+  display: none;
+}
+#dialogbox3{
+  display: none;
+}
+.dialogtitle{
+  text-align: center;
+  width: 300px;
+  height: 25px;
+  background-color: #CCCCCC;
+  padding-top: 4px;
+}
+.dialogbody{
+  text-align: center;
+  padding-top: 25px;
+        padding-right: 25px;
+        padding-bottom: 25px;
+        padding-left: 25px;
+  background: #fff;
+}
+.xbutton{
+
+    float:right;
+    display:inline-block;
+    padding:2px 5px;
+    background:#ccc;
+}
+.xbutton:hover {
+    float:right;
+    display:inline-block;
+    padding:2px 5px;
+    background:#ccc;
+    color:#fff;
+}
+.choice{
+  background-color: #AFB0AEE6;
+  border: 1px solid #0d0d0d;
+  color: black;
+  width: 250px;
+  padding: 10px 30px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+.choice:hover{
+  background-color: #fff;
+  border: 1px solid #0d0d0d;
+  color: black;
+  width: 250px;
+  padding: 10px 30px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
 }

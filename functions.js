@@ -6,24 +6,27 @@ function duplicatebranches(draggedNode,d){
        childcount = draggedNode.children.length
      
      if (childcount > 0) {//add children of dragged node to the children of d node
-         for (j =0 ; j<childcount;j++){
+         for (j =0 ; j<childcount;j++)
            addtochildren(d,draggedNode.children[0])
          }
          var copysubtree=clonetree(d, draggedNode.depth, draggedNode.height);
          console.log("copysubtree")
          console.log(copysubtree)
-         copysubtree.children.forEach(function(f){
-         f.parent=draggedNode;
-            if (typeof draggedNode.children !== 'undefined') {
-                 draggedNode.children.push(f);
-             } else {
-                 draggedNode.children=[];
-                 draggedNode.data.children=[];
-                 draggedNode.children.push(f);
-             }
-             draggedNode.data.children.push(f.data);
-         })
-  }
+         if (typeof copysubtree.children!='undefined'){
+          copysubtree.children.forEach(function(f){
+          f.parent=draggedNode;
+             if (typeof draggedNode.children !== 'undefined') {
+                  draggedNode.children.push(f);
+              } else {
+                  draggedNode.children=[];
+                  draggedNode.data.children=[];
+                  draggedNode.children.push(f);
+              }
+              draggedNode.data.children.push(f.data);
+          })
+         }
+         
+  
    draggedNode.data.name= d.data.name+"&" + draggedNode.data.name;
 
   
@@ -31,11 +34,7 @@ function duplicatebranches(draggedNode,d){
   console.log(draggedNode.data.name)
    
    d3.selectAll('.copys').remove();
-   //removelink(draggedNode);
-   //removedraggedNode(draggedNode)
-   //console.log(root)
-  // transformNode(draggedNode,originalX,originalY);
-  // updatealltext();
+   updatealltext();
    deshadownode();
   // console.log(root);
    
@@ -189,4 +188,30 @@ function transformNode(draggedNode,originalX,originalY){
     return false;
     
   }).attr("transform", "translate(" + originalX + "," + originalY + ")");
+}
+function mergeNodes(draggedNode,d,root){
+  var childcount=0;
+  if (typeof draggedNode.children !='undefined'){             
+        childcount = draggedNode.children.length
+  }
+               
+    if (childcount > 0) {//add children of dragged node to the children of d node
+                 
+         for (j =0 ; j<childcount;j++){
+                   
+            addtochildren(d,draggedNode.children[0])
+         }
+                 
+     }
+               //
+               
+       d.data.name= d.data.name+"&" + draggedNode.data.name;
+       update(d,svg,root)
+       updatealltext()
+       
+       d3.selectAll('.copys').remove();
+
+       removelink(draggedNode);
+       
+       removedraggedNode(draggedNode)
 }

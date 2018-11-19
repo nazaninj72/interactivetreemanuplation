@@ -9,23 +9,44 @@
 <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
 
 <body>
+	<div class="container">
+		<div class="recomwindow" id="recom_container">
+			<div class="dialogbox" id="dialogbox1" > 
+				<div class="dialogtitle" id="dTitle"> How to interact nodes?
+					<input type="button" class ="xbutton" id="xbutton" value="X" onclick="windowClose();"></div> 
+				<div class ="dialogbody" id="dBody">
+					<button type="button" class="choice" id="duplicatenodes" ">Copy node in each branch</button>
+					<button type="button" class="choice" id="mergenodes" ">Merge with this node in dropping point</button>
+				</div>
+				
+			</div>
+			<div class="dialogbox" id="dialogbox2" > 
+				<div class="dialogtitle" id="dTitle"> How to interact nodes?
+					<input type="button" class ="xbutton" id="xbutton2" value="X" onclick="windowClose();"></div> 
+				<div class ="dialogbody" id="dBody">
+					<button type="button" class="choice" id="mergenodes2" ">Merge with this node in dropping point</button>
+				</div>
+				
+			</div>
+			<div class="dialogbox" id="dialogbox3" > 
+				<div class="dialogtitle" id="dTitle"> How to interact node and link?
+					<input type="button" class ="xbutton" id="xbutton3" value="X" onclick="windowClose();"></div> 
+				<div class ="dialogbody" id="dBody">
+					<button type="button" class="choice" id="addtomiddle" ">Add in between two nodes</button>
+					<button type="button" class="choice" id="addtochildren" ">Add to children of nodes</button>
+				</div>
+				
+			</div>
+		</div>
+		<div class="tree" id= "tree_container">	
+			<script src="main.js"></script>
+			<script src="functions.js"></script>
+		</div>
+		
+		
 
-<!-- load the d3.js library -->
-<script src="functions.js"></script>  
-<script src="main.js"></script>
-<div id="dialog-1" class="ui-dialog-content ui-widget-content" " title = "Please choose">
-    <button class="ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all" id="firstbutton">
-   <span class="ui-button-text">copy node in each branch</span>
-</button>
-     <input type="button" id="secondbutton" name="second" value="Merge with this node in dropping point" />
-   </div>
-   <div id = "linedialog" 
-     title = "Please choose">
-     <input type="button" id="linebutton1" name="first" value="add in the middle of two nodes" />
-     <input type="button" id="linebutton2" name="second" value="Add node to the children of this node" />
-   </div>
-<div id="undooption">
-	<input type="button" id="undobutton" value="undo">
-</div>
+
+	</div>
+	
 
 </body>

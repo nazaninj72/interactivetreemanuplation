@@ -33,37 +33,22 @@ var data =
       }
     ]
   };
-
-// ### DATA MODEL END
-
-// Set the dimensions and margins of the diagram
 var margin = {top: 20, right: 90, bottom: 30, left: 90},
-	width = 1060 - margin.left - margin.right,
-  height = 500 - margin.top - margin.bottom;
-
-// append the svg object to the body of the page
-// appends a 'group' element to 'svg'
-// moves the 'group' element to the top left margin
-var svg = d3.select("body").
-	append("svg").
-  attr("width", width + margin.right + margin.left).
-  attr("height", height + margin.top + margin.bottom).
-  append("g").
-  attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-
-var i = 0, duration = 0, root;
-
-// declares a tree layout and assigns the size
+width = 1060 - margin.left - margin.right,
+height = 500 - margin.top - margin.bottom;
+var svg = d3.select("#tree_container").
+append("svg").
+attr("width", width + margin.right + margin.left).
+attr("height", height + margin.top + margin.bottom).
+append("g").
+attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var i = 0, duration = 500, root;
 var treemap = d3.tree().size([height, width]);
 root = d3.hierarchy(data, function(d) {
   return d.children;
 });
 root.x0 = height / 2;
 root.y0 = 0;
-
-
-
 update(root,svg,root);
 function update(source,svg,root) {
 
@@ -280,20 +265,7 @@ function clonenode(node, isleaf, depth, height){
    
     return newNode;
 }
-
-$(function() {
-    $( "#dialog-1" ).dialog({
-       autoOpen: false,  
-    });
-    $
-
-    $( "#linedialog" ).dialog({
-       autoOpen: false,  
-    });
-    $
- });
-
- var originalX=null;
+var originalX=null;
 var originalY=null;
 
 var permchanges=[];
@@ -301,29 +273,6 @@ var permchanges=[];
 var rootdouble;
 rootdouble=clonetree(root, root.depth, root.height)
 permchanges.push(rootdouble)
-
-$(function() {
- $("#undobutton").click(function(){
-  if (permchanges.length<=1){
-     $(this).prop("disabled",true);
-     
-  }else{
-    $(this).prop("disabled",false);
-    console.log(permchanges.length)
-      permchanges.pop()
-     // console.log(permchanges.length)
-     // console.log(permchanges[permchanges.length-1])
-      root=clonetree(permchanges[permchanges.length-1],permchanges[permchanges.length-1].depth,permchanges[permchanges.length-1].height);
-      root.x0 = height / 2;
-      root.y0 = 0;
-      //console.log(root)
-      update(root,svg,root) 
-      updatealltext();
-
-  }          
-})
-})
-
 function dragstarted(d) {
   draggingNode = d;
   d3.select(this).raise().classed("active", true);
@@ -354,68 +303,61 @@ function dragged(d) {
   d3.select(this).attr("transform", "translate(" + d.y + "," + d.x + ")");
 }
 function dragended(d) {
-  var first = false;
-  draggedNode=d;
-  var childcount =0;
-
+  var touchedNode=false;
+ var draggedNode=d;
+ var childcount=0;
+ var clicked = false;
+ var active=false;
   svg.selectAll('g.node')
     .filter(function(d, i) {
-      if(distance(draggedNode.x,draggedNode.y, d.x, d.y) < 30 && draggedNode!=d){
-
-
-                 //should check the cases in here
-          if (draggedNode.parent==d.parent && d.depth==draggedNode.depth) //same level same branch
+      if(distance(draggedNode.x,draggedNode.y, d.x, d.y) < 20 && draggedNode!=d){
+        touchedNode=true;
+        if (d.depth==draggedNode.depth) //same level different branch or same branch
           {
-           // console.log(permchanges[0])
-            if (typeof draggedNode.children !='undefined')
-              childcount = draggedNode.children.length
-            
-              if (childcount > 0) {//add children of dragged node to the children of d node
-              
-                for (j =0 ; j<childcount;j++){
-                
-                  addtochildren(d,draggedNode.children[0])
-                }
-                 
-              }
+            d3.select("body").select("#dialogbox1").style("display", "block")
+            $("#duplicatenodes").click(function(){// create copy of nodes in each branch
+                  clicked=true;
+                  duplicatebranches(draggedNode,d,root)
+                  update(draggedNode,svg,root)
+                  permchanges.push(clonetree(root,root.depth,root.height))
+                  d3.select("body").select("div.dialogbox").style("display", "none")
 
-               d.data.name= d.data.name+"&" + draggedNode.data.name; 
-               d3.selectAll('.copys').remove();//remove copy of node
-               //remove link of the node 
-               removelink(draggedNode);
-               updatealltext();
-               removedraggedNode(draggedNode)
-               permchanges.push(clonetree(root,root.depth,root.height))
-          
-          }
-        if (draggedNode.parent!=d.parent && d.depth==draggedNode.depth){//same level different branch
-                              
-                        $( "#dialog-1" ).dialog( "open" );
-                        var firstover=false;
-                        $("#firstbutton").mouseenter(function(){
-                          if (!firstover){
-                           // console.log(draggedNode.id)
-                            rootC=clonetree(root,root.depth,root.height)
-                           // console.log(rootC)
-                            var draggedNodeC=findNode(rootC,draggedNode);
-                          //  console.log(draggedNodeC)
-                            var dC=findNode(rootC,d)
-                          //  console.log(dC)
+            });
+           // var firstover=false;
+            $("#duplicatenodes").mouseenter(function(){
+              duration=500;
+             // if (!firstover){
+               // console.log(draggedNode.id)
+                rootC=clonetree(root,root.depth,root.height)
+               // console.log(rootC)
+                var draggedNodeC=findNode(rootC,draggedNode);
+              //  console.log(draggedNodeC)
+                var dC=findNode(rootC,d)
+              //  console.log(dC)
 
-                          duplicatebranches(draggedNodeC,dC,rootC)
-                       // duplicatebranches(draggedNode,d)
+              duplicatebranches(draggedNodeC,dC,rootC)
+           // duplicatebranches(draggedNode,d)
 
-                          update(draggedNodeC,svg,rootC)
-                          updatealltext();
-                        }
-        })
-                     
-              $("#firstbutton").mouseleave(function(){
+              update(draggedNodeC,svg,rootC)
+              //newOpacity=0.6;
+              //svg.selectAll("*").style("opacity", newOpacity);
+              updatealltext();
+              duplicatenodes.active = active;
+            //}
+
+            })
+                         
+            $("#duplicatenodes").mouseleave(function(){
+              if(!clicked){
                 svg.selectAll("*").remove();
+                duration=0;
                 update(root,svg,root)
-              })
-              $("#secondbutton").mouseenter(function(){
-                  rootC=clonetree(root,root.depth,root.height)
+              }
+              
+              
+            })
+            $("#mergenodes").mouseenter(function(){
+              rootC=clonetree(root,root.depth,root.height)
                //  console.log(rootC)
                   var draggedNodeC=findNode(rootC,draggedNode);
                   console.log(draggedNodeC)
@@ -446,32 +388,25 @@ function dragended(d) {
                 removelink(draggedNodeC);
                 
                 removedraggedNode(draggedNodeC)
-                update(rootC,svg,rootC)
-                updatealltext();
+                
               })
-              $("#secondbutton").mouseleave(function(){
+              $("#mergenodes").mouseleave(function(){
+               if(!clicked){
                 svg.selectAll("*").remove();
+                duration=0;
                 update(root,svg,root)
+               }
+                
+               
               })
-              $("#firstbutton").click(function(){// create copy of nodes in each branch
-                    //close dialog box first then
-                    
-                    //console.log(draggedNode.depth + "," + draggedNode.height)
-                    $( "#dialog-1" ).dialog( "close" );
-                        duplicatebranches(draggedNode,d,root)
-                       // duplicatebranches(draggedNode,d)
+             
+             $("#mergenodes").click(function(){
+              clicked=true;
 
-                        update(draggedNode,svg,root)
-                        permchanges.push(clonetree(root,root.depth,root.height))
-        
-              });
-              
-              $("#secondbutton").click(function(){ //move the node to dropping point
-                
-                $( "#dialog-1" ).dialog( "close" );
-                
-                  if (typeof draggedNode.children !='undefined')
+               if (typeof draggedNode.children !='undefined'){
+                   
                     childcount = draggedNode.children.length
+                 }
                   
                   if (childcount > 0) {//add children of dragged node to the children of d node
                     
@@ -479,159 +414,202 @@ function dragended(d) {
                       
                         addtochildren(d,draggedNode.children[0])
                       }
-                       // console.log(f) 
+                    
                   }
+                  //
                 d.data.name= d.data.name+"&" + draggedNode.data.name;
                 update(d,svg,root)
                 updatealltext()
+                
                 d3.selectAll('.copys').remove();
                 removelink(draggedNode);
-                //updatealltext();
-                removedraggedNode(draggedNode)
-                update(d,svg,root)
+                removedraggedNode(draggedNode) 
                 permchanges.push(clonetree(root,root.depth,root.height))
-               
+                A = d3.select("body").select("div.dialogbox")
+                console.log(A)
+                A.style("display", "none")
+                
               });
 
-
-
-
-             }//check for secondcase
-             else if (draggedNode.parent!=d.parent && d.depth!=draggedNode.depth &&draggedNode.parent!=d && d.parent!=draggedNode){//different level different branch
-                                 
-                   if (typeof draggedNode.children !='undefined')
-                       childcount = draggedNode.children.length
-                     
-                       if (childcount > 0) {//add children of dragged node to the children of d node
-                       
-                         for (j =0 ; j<childcount;j++){
-                         
-                           addtochildren(d,draggedNode.children[0])
-                         }
-                          // console.log(f) 
-                        }
-                         d.data.name= d.data.name+"&" + draggedNode.data.name;
-                         d3.selectAll('.copys').remove();
-                         removelink(draggedNode);
-                         updatealltext();
-                         removedraggedNode(draggedNode)
-                         update(root,svg,root)
-                         permchanges.push(clonetree(root,root.depth,root.height))
-                     
-             }
-              else if (draggedNode.parent!=d.parent && d.depth!=draggedNode.depth &&draggedNode.parent==d ){//same branch different level
-                  if (typeof draggedNode.children !='undefined')
-                    childcount = draggedNode.children.length
+          }else if (draggedNode.parent!=d.parent && d.depth!=draggedNode.depth){//all other cases
+            d3.select("body").select("#dialogbox2").style("display", "block")
+            $("#mergenodes2").click(function(){
+              clicked=true;
+              if (draggedNode.parent!=d && d.parent!=draggedNode){//different level different branch    
+                            
+                  mergeNodes(draggedNode,d,root)                          
+                  permchanges.push(clonetree(root,root.depth,root.height))      
+                        
+              }else if(draggedNode.parent==d){
+                  mergeNodes(draggedNode,d,root) 
+                   permchanges.push(clonetree(root,root.depth,root.height))
+              }else if (draggedNode==d.parent){
+                if (typeof d.children !='undefined')
+                  childcount = d.children.length
+                
+                if (childcount > 0) {//add children of dragged node to the children of d node
                   
-                  if (childcount > 0) {//add children of dragged node to the children of d node
+                    for (j =0 ; j<childcount;j++){
                     
-                      for (j =0 ; j<childcount;j++){
-                      
-                        addtochildren(d,draggedNode.children[0])
-                      }
-                }
-                   d.data.name= d.data.name+"&" + draggedNode.data.name; 
-                   d3.selectAll('.copys').remove();//remove copy of node
-                   //remove link of the node 
-                   removelink(draggedNode);
-                   updatealltext();
-                   removedraggedNode(draggedNode)
-                   update(root,svg,root)
-                   permchanges.push(clonetree(root,root.depth,root.height))
-                  // permchanges.push(clonetree(root,root.depth,root.height))
-             } //forthcase
-             else if (draggedNode.parent!=d.parent && d.depth!=draggedNode.depth &&draggedNode==d.parent){
-                   if (typeof d.children !='undefined')
-                     childcount = d.children.length
-                   
-                   if (childcount > 0) {//add children of dragged node to the children of d node
-                     
-                       for (j =0 ; j<childcount;j++){
-                       
-                         addtochildren(draggedNode,d.children[0])
-                       }
-                   }else{
-                     transformNode(draggedNode,originalX,originalY)
+                      addtochildren(draggedNode,d.children[0])
+                    }
+                }else{
+                  transformNode(draggedNode,originalX,originalY)
 
-                   }
-                   draggedNode.data.name= d.data.name +"&"+draggedNode.data.name; 
-                   d3.selectAll('.copys').remove();
-                   removelink(d);
-                   updatealltext();
-                   removedraggedNode(d)
-                   deshadownode()
-                   update(root,svg,root)
-                   permchanges.push(clonetree(root,root.depth,root.height))
-             } 
-            return true
-           }else{
-              return false
+                }
+               
+                draggedNode.data.name= d.data.name +"&"+draggedNode.data.name; 
+                d3.selectAll('.copys').remove();
+                removelink(d);
+                updatealltext();
+                removedraggedNode(d)
+                deshadownode()
+                update(root,svg,root)
+                permchanges.push(clonetree(root,root.depth,root.height))
+              
+              }
+              
+              d3.select("body").selectAll("div.dialogbox").style("display", "none")
+            });
+            $("#mergenodes2").mouseenter(function(){
+              duration=500;
+              if (draggedNode.parent!=d && d.parent!=draggedNode){
+                rootC=clonetree(root,root.depth,root.height)
+                // console.log(rootC)
+                  var draggedNodeC=findNode(rootC,draggedNode);
+                //  console.log(draggedNodeC)
+                  var dC=findNode(rootC,d)
+                //  console.log(dC)
+                  mergeNodes(draggedNodeC,dC,rootC) 
+
+              }else if(draggedNode.parent==d){
+                rootC=clonetree(root,root.depth,root.height)
+                 //console.log(rootC)
+                  var draggedNodeC=findNode(rootC,draggedNode);
+                  //console.log(draggedNodeC)
+                  var dC=findNode(rootC,d)
+                 // console.log(dC)
+                  mergeNodes(draggedNodeC,dC,rootC)
+
+              }else if (draggedNode==d.parent){
+                rootC=clonetree(root,root.depth,root.height)
+                 console.log(rootC)
+                var draggedNodeC=findNode(rootC,draggedNode);
+                  console.log(draggedNodeC)
+                  var dC=findNode(rootC,d)
+                  console.log(dC)
+                 if (typeof dC.children !='undefined')
+                   childcount = dC.children.length
+                 
+                 if (childcount > 0) {//add children of dragged node to the children of d node
+                   
+                     for (j =0 ; j<childcount;j++){
+                     
+                       addtochildren(draggedNodeC,dC.children[0])
+                     }
+                 }else{
+                   transformNode(draggedNodeC,originalX,originalY)
+
+                 }
+                 draggedNodeC.data.name= dC.data.name +"&"+draggedNodeC.data.name; 
+                 update(rootC,svg,rootC)
+                 updatealltext();
+                 d3.selectAll('.copys').remove();
+                 removelink(dC);
+                 removedraggedNode(dC)
+                 deshadownode()
+                 update(rootC,svg,rootC)
+                  
 
               }
-  })
-  svg.selectAll('line.link').filter(function(d,i){
-    if (draggedNode!=d && isNearLine(draggedNode.x,draggedNode.y,d)){
-      $( "#linedialog" ).dialog( "open" );
-      $("#linebutton1").mouseenter(function(){
-          rootC=clonetree(root,root.depth,root.height)
-         // console.log(rootC)
-          var draggedNodeC=findNode(rootC,draggedNode);
-        //  console.log(draggedNodeC)
-          var dC=findNode(rootC,d)
-          addtochildren(dC.parent,draggedNodeC)
-          addtochildren(draggedNodeC,dC)
-          deshadownode()
-           d3.selectAll('.copys').remove();
-           update(draggedNodeC,svg,rootC)
-
-      })
-      $("#linebutton1").mouseleave(function(){
-        svg.selectAll("*").remove();
-        update(root,svg,root)
-      })
-      $("#linebutton1").click(function(){//adding in the middle of the link
-          $( "#linedialog" ).dialog( "close" );
-          addtochildren(d.parent,draggedNode)
-          addtochildren(draggedNode,d)
-          deshadownode()
-           d3.selectAll('.copys').remove();
-           update(root,svg,root)
-           permchanges.push(clonetree(root,root.depth,root.height))
-
-        })
-      $("#linebutton2").mouseenter(function(){
-          rootC=clonetree(root,root.depth,root.height)
-         // console.log(rootC)
-          var draggedNodeC=findNode(rootC,draggedNode);
-        //  console.log(draggedNodeC)
-          var dC=findNode(rootC,d)
-          addtochildren(dC.parent,draggedNodeC)
-          deshadownode()
-          d3.selectAll('.copys').remove();
-          update(draggedNodeC,svg,rootC)
-
-        })
-       $("#linebutton2").mouseleave(function(){
-        svg.selectAll("*").remove();
-        update(root,svg,root)
-      })
-     $("#linebutton2").click(function(){
-      $( "#linedialog" ).dialog( "close" );
+            })
+            $("#mergenodes2").mouseleave(function(){
+              if (!clicked){
+                svg.selectAll("*").remove();
+                duration=0;
+                update(root,svg,root)
+              }
+            })
+             
+          }
+        return true//distance check
+        }else{
+          return false
+        }//end of distance check
+       })
+svg.selectAll('line.link').filter(function(d,i){
+  if (draggedNode!=d && isNearLine(draggedNode.x,draggedNode.y,d)){
+    if (!touchedNode){
+      d3.select("body").select("#dialogbox3").style("display", "block")
+      $("#addtomiddle").click(function(){
+        clicked=true;
+      addtochildren(d.parent,draggedNode)
+      addtochildren(draggedNode,d)
+      deshadownode()
+       d3.selectAll('.copys').remove();
+       update(root,svg,root)
+       permchanges.push(clonetree(root,root.depth,root.height))
+       d3.select("body").selectAll("div.dialogbox").style("display", "none")
+     })
+     $("#addtochildren").click(function(){
+      clicked=true;
         addtochildren(d.parent,draggedNode)
         deshadownode()
         d3.selectAll('.copys').remove();
         update(root,svg,root)
         permchanges.push(clonetree(root,root.depth,root.height))
+        d3.select("body").selectAll("div.dialogbox").style("display", "none")
+     })
+     $("#addtomiddle").mouseenter(function(){
+
+        rootC=clonetree(root,root.depth,root.height)
+        console.log(rootC)
+        var draggedNodeC=findNode(rootC,draggedNode);
+        console.log(draggedNodeC)
+        var dC=findNode(rootC,d)
+         addtochildren(dC.parent,draggedNodeC)
+         addtochildren(draggedNodeC,dC)
+         deshadownode()
+         d3.selectAll('.copys').remove();
+         update(rootC,svg,rootC)
+     })
+     $("#addtomiddle").mouseleave(function(){
+        if (!clicked){
+          svg.selectAll("*").remove();
+          duration=0;
+          update(root,svg,root)
+        }
+     })
+     $("#addtochildren").mouseenter(function(){
+        rootC=clonetree(root,root.depth,root.height)
+        console.log(rootC)
+        var draggedNodeC=findNode(rootC,draggedNode);
+        console.log(draggedNodeC)
+        var dC=findNode(rootC,d)
+        addtochildren(dC.parent,draggedNodeC)
+        deshadownode()
+        d3.selectAll('.copys').remove();
+        update(rootC,svg,rootC)
+     })
+     $("#addtochildren").mouseleave(function(){
+        if (!clicked){
+          svg.selectAll("*").remove();
+          duration=0;
+          update(root,svg,root)
+        }
      })
 
-     // console.log(d)
-      return true
+    }
+    return true
     }else{
       return false
     }
 
 })
+  d3.select(this).classed("active", false);
+}
 
 
-d3.select(this).classed("active", false);
+function windowClose(){
+  d3.select("body").selectAll("div.dialogbox").style("display", "none")
 }
