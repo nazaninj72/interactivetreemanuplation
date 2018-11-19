@@ -273,6 +273,27 @@ var permchanges=[];
 var rootdouble;
 rootdouble=clonetree(root, root.depth, root.height)
 permchanges.push(rootdouble)
+$(function() {
+ $("#undobutton").click(function(){
+  if (permchanges.length<=1){
+     $(this).prop("disabled",true);
+     
+  }else{
+    $(this).prop("disabled",false);
+    console.log(permchanges.length)
+      permchanges.pop()
+     // console.log(permchanges.length)
+     // console.log(permchanges[permchanges.length-1])
+      root=clonetree(permchanges[permchanges.length-1],permchanges[permchanges.length-1].depth,permchanges[permchanges.length-1].height);
+      root.x0 = height / 2;
+      root.y0 = 0;
+      //console.log(root)
+      update(root,svg,root) 
+      updatealltext();
+
+  }          
+})
+})
 function dragstarted(d) {
   draggingNode = d;
   d3.select(this).raise().classed("active", true);
