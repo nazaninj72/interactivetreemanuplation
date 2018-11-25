@@ -1,39 +1,38 @@
-function duplicatebranches(draggedNode,d){
-  console.log(draggedNode)
-  console.log(d)
+function duplicatebranches(g,k){
+  //console.log(draggedNode)
+  //console.log(d)
   var childcount=0;
-  if (typeof draggedNode.children !='undefined')
-       childcount = draggedNode.children.length
+  if (typeof g.children !='undefined')
+       childcount = g.children.length
      
      if (childcount > 0) {//add children of dragged node to the children of d node
          for (j =0 ; j<childcount;j++)
-           addtochildren(d,draggedNode.children[0])
+           addtochildren(k,g.children[0])
          }
-         var copysubtree=clonetree(d, draggedNode.depth, draggedNode.height);
-         console.log("copysubtree")
-         console.log(copysubtree)
+         var copysubtree=clonetree(k, g.depth, g.height);
+        // console.log("copysubtree")
+        // console.log(copysubtree)
          if (typeof copysubtree.children!='undefined'){
           copysubtree.children.forEach(function(f){
-          f.parent=draggedNode;
-             if (typeof draggedNode.children !== 'undefined') {
-                  draggedNode.children.push(f);
+          f.parent=g;
+             if (typeof g.children !== 'undefined') {
+                  g.children.push(f);
               } else {
-                  draggedNode.children=[];
-                  draggedNode.data.children=[];
-                  draggedNode.children.push(f);
+                  g.children=[];
+                  g.data.children=[];
+                  g.children.push(f);
               }
-              draggedNode.data.children.push(f.data);
+              g.data.children.push(f.data);
           })
          }
          
   
-   draggedNode.data.name= d.data.name+"&" + draggedNode.data.name;
+   g.data.name= k.data.name+"&" + g.data.name;
 
   
-   d.data.name= draggedNode.data.name;
-  console.log(draggedNode.data.name)
-   
-   d3.selectAll('.copys').remove();
+   k.data.name= g.data.name;
+   console.log("draggedNode.data.name")
+   console.log(g.data.name)
    updatealltext();
    deshadownode();
   // console.log(root);
@@ -51,9 +50,11 @@ function findNode(rootC,d){
    nodes.forEach(function(f){
       if (d.id==f.id){
       foundnode=f;
-  }
+    }
   });
   }
+ // console.log("foundnode")
+ // console.log(foundnode)
   return foundnode
 
 }
@@ -81,6 +82,7 @@ function addtochildren(d,f){
   delete f.parent.children
   delete f.parent.data.children
  }
+ //console.log("children of parent of draggedNode")
  //console.log(f.parent.children)
  f.depth = d.depth + 1; 
  f.height = d.height - 1;
@@ -125,6 +127,11 @@ function removedraggedNode(f){
      f.parent.children.splice(index, 1);
      f.parent.data.children.splice(index, 1);
    }
+   if (f.parent.children.length == 0)
+      {
+       delete f.parent.children
+       delete f.parent.data.children
+       }
 
 }
 function isNearLine(x,y,d){
@@ -203,7 +210,7 @@ function mergeNodes(draggedNode,d,root){
          }
                  
      }
-               //
+              //console.log(f.parent.children.length)
                
        d.data.name= d.data.name+"&" + draggedNode.data.name;
        update(d,svg,root)
@@ -214,4 +221,58 @@ function mergeNodes(draggedNode,d,root){
        removelink(draggedNode);
        
        removedraggedNode(draggedNode)
+}
+function clonetree(root, depth, height){
+
+  var cloneroot=clonenode(root, typeof root.children=='undefined', depth, height)
+ 
+
+  if (typeof root.children!='undefined'){
+   // console.log("entered here")
+ 
+    root.children.forEach(function(f){
+      var newNode=clonetree(f, depth + 1, height - 1)
+     //console.log("newnode")
+     //console.log(newNode)
+      cloneroot.children.push(newNode)
+      cloneroot.data.children.push(newNode.data)
+      newNode.parent=cloneroot;
+    })
+      
+     
+     // console.log("newnode after adding children")
+     // console.log(newNode)
+    
+    //j=0;
+    return cloneroot;
+  }else{
+   // console.log(cloneroot)
+  // j=0;
+    return cloneroot;
+
+  }
+} 
+function clonenode(node, isleaf, depth, height){
+  var newNode = {
+     
+      name: node.data.name,
+      
+    };
+
+    //Creates a Node from newNode object using d3.hierarchy(.)
+    var newNode = d3.hierarchy(newNode);
+    newNode.depth = depth
+    newNode.height = height
+    newNode.id=node.id
+    newNode.x=node.x;
+    newNode.y=node.y;
+    newNode.x0=node.x0;
+    newNode.y0=node.y0;
+    //newNode.height = root.height - 1
+    if(!isleaf){
+      newNode.children=[];
+      newNode.data.children=[];
+    }
+   
+    return newNode;
 }
