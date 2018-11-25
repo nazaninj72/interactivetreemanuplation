@@ -10,6 +10,8 @@ function duplicatebranches(g,k){
            addtochildren(k,g.children[0])
          }
          var copysubtree=clonetree(k, g.depth, g.height);
+         var nodeupdates=copysubtree.descendants();
+         
         // console.log("copysubtree")
         // console.log(copysubtree)
          if (typeof copysubtree.children!='undefined'){
@@ -31,8 +33,8 @@ function duplicatebranches(g,k){
 
   
    k.data.name= g.data.name;
-   console.log("draggedNode.data.name")
-   console.log(g.data.name)
+ //  console.log("draggedNode.data.name")
+ //  console.log(g.data.name)
    updatealltext();
    deshadownode();
   // console.log(root);
@@ -275,4 +277,11 @@ function clonenode(node, isleaf, depth, height){
     }
    
     return newNode;
+}
+function updateids(root){
+  var nodez=root.descendants();
+  var j  = 0;
+  nodez.forEach(function(f){
+    return f.id=++j;
+  })
 }
