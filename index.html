@@ -6,11 +6,14 @@
 <script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
 <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>   
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.2/d3.min.js"></script>
+<script src="https://d3js.org/d3-path.v1.min.js"></script>
+<script src="https://d3js.org/d3-shape.v1.min.js"></script>
 <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
 
 <body>
 	<div class="container">
 		<div class="recomwindow" id="recom_container">
+
 			<div class="dialogbox" id="dialogbox1" > 
 				<div class="dialogtitle" id="dTitle"> How to interact nodes?
 					<input type="button" class ="xbutton" id="xbutton" value="X" onclick="windowClose();"></div> 
@@ -39,15 +42,23 @@
 			</div>
 		</div>
 		<div class="tree" id= "tree_container">	
-			<script src="main.js"></script>
+
+			
+			<script async  src="main.js"></script>
 			<script src="functions.js"></script>
+			<ul>
+			 <button type="button" class="layoutval" onclick="getLayout(1);"">Horizontal</button>
+			 <button type="button" class="layoutval" id="layoutV" value="vertical" onclick="getLayout(2);"">Vertical</button>
+			 <button type="button" class="layoutval" id="layoutindent" value="indented" onclick="getLayout(3);"">Indented</button>
+			</ul>
 		</div>
+
 		
 		
 
-		 <div id="undooption">
+		<!--  <div id="undooption">
 			<input type="button" id="undobutton" value="undo">
-		</div>
+		</div> -->
 	</div>
 	
 

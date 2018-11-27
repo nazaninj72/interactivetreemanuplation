@@ -1,3 +1,8 @@
+function clone(selector) {
+    var node = d3.select(selector).node();
+    return d3.select(node.parentNode.insertBefore(node.cloneNode(true),
+node.nextSibling));
+}
 function duplicatebranches(g,k){
   //console.log(draggedNode)
   //console.log(d)
@@ -215,7 +220,7 @@ function mergeNodes(draggedNode,d,root){
               //console.log(f.parent.children.length)
                
        d.data.name= d.data.name+"&" + draggedNode.data.name;
-       update(d,svg,root)
+       
        updatealltext()
        
        d3.selectAll('.copys').remove();
@@ -224,60 +229,7 @@ function mergeNodes(draggedNode,d,root){
        
        removedraggedNode(draggedNode)
 }
-function clonetree(root, depth, height){
 
-  var cloneroot=clonenode(root, typeof root.children=='undefined', depth, height)
- 
-
-  if (typeof root.children!='undefined'){
-   // console.log("entered here")
- 
-    root.children.forEach(function(f){
-      var newNode=clonetree(f, depth + 1, height - 1)
-     //console.log("newnode")
-     //console.log(newNode)
-      cloneroot.children.push(newNode)
-      cloneroot.data.children.push(newNode.data)
-      newNode.parent=cloneroot;
-    })
-      
-     
-     // console.log("newnode after adding children")
-     // console.log(newNode)
-    
-    //j=0;
-    return cloneroot;
-  }else{
-   // console.log(cloneroot)
-  // j=0;
-    return cloneroot;
-
-  }
-} 
-function clonenode(node, isleaf, depth, height){
-  var newNode = {
-     
-      name: node.data.name,
-      
-    };
-
-    //Creates a Node from newNode object using d3.hierarchy(.)
-    var newNode = d3.hierarchy(newNode);
-    newNode.depth = depth
-    newNode.height = height
-    newNode.id=node.id
-    newNode.x=node.x;
-    newNode.y=node.y;
-    newNode.x0=node.x0;
-    newNode.y0=node.y0;
-    //newNode.height = root.height - 1
-    if(!isleaf){
-      newNode.children=[];
-      newNode.data.children=[];
-    }
-   
-    return newNode;
-}
 function updateids(root){
   var nodez=root.descendants();
   var j  = 0;

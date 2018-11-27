@@ -1,57 +1,57 @@
-var data =
-  {
-    "name": "A",
-    "children": [
-      { 
-    "name": "B",
-        "children": [
-          { "name": "C" },
-          { "name": "D", 
-              "children" : [
-              {"name": "H",
-                "children": [
-                {"name": "J"}
-                ]
-            },
-              {"name" : "L"}
-              ]
-        }
-        ]
-      },
-      { 
-        "name": "E" ,
-        "children": [
-          { "name": "f",
-          "children": [
-                {"name": "K"}
-                ]
-           },
-          { "name": "g" }
-        ]
-      },{
-        "name": "I"
-      }
-    ]
-  };
+
 var margin = {top: 20, right: 90, bottom: 30, left: 90},
 width = 1060 - margin.left - margin.right,
 height = 500 - margin.top - margin.bottom;
 var svg = d3.select("#tree_container").
 append("svg").
 attr("width", width + margin.right + margin.left).
-attr("height", height + margin.top + margin.bottom).
-append("g").
-attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+attr("height", height + margin.top + margin.bottom).call(d3.zoom().on("zoom", function () {
+              svg.attr("transform", d3.event.transform)
+      }))
+     .append('g').attr("transform","translate(" + width / 2 + "," + 0 + ")")
+.append('g');
 var i = 0, duration = 500, root;
-var treemap = d3.tree().size([height, width]);
+var panSpeed = 200;
+var panBoundary = 20;
+var chosenlayout="horizontal"//default is horizontal
+function getLayout(layout) {
+  if (layout==1)
+    chosenlayout = "horizontal"
+  if (layout==2)
+    chosenlayout = "vertical"
+  if (layout==3)
+    chosenlayout = "indented" 
+   console.log(chosenlayout)
+}
+treeJSON = d3.json("flare.json", function(error, data) {  
+
+var treemap = d3.tree()
+  .size([5*height, 10*width])
+  .separation(function separation(a, b) { return a.parent == b.parent ? 2 : 2; });
 root = d3.hierarchy(data, function(d) {
   return d.children;
 });
 root.x0 = height / 2;
 root.y0 = 0;
-update(root,svg,root);
+if (chosenlayout=="horizontal"){
+  
+  updateHorizontal(root,svg,root);
+}
+else if(chosenlayout == "vertical"){
+  updateVertical(root,svg,rootC)
+}
 var draggingNode=null;
-function update(source,svg,root) {
+
+
+//create zoom handler 
+
+    
+//specify what to do when zoom event listener is triggered 
+
+
+//add zoom behaviour to the svg element backing our graph.  
+//same thing as svg.call(zoom_handler); 
+function updateHorizontal(source,svg,root) {
 
   // Assigns the x and y position for the nodes
   var treeData = treemap(root);
@@ -215,61 +215,171 @@ function update(source,svg,root) {
     d.y0 = d.y;
   }); 
 }
-function clonetree(root, depth, height){
 
-  var cloneroot=clonenode(root, typeof root.children=='undefined', depth, height)
- 
+function updateVertical(source,svg,root) {
 
-  if (typeof root.children!='undefined'){
-   // console.log("entered here")
- 
-    root.children.forEach(function(f){
-      var newNode=clonetree(f, depth + 1, height - 1)
-     //console.log("newnode")
-     //console.log(newNode)
-      cloneroot.children.push(newNode)
-      cloneroot.data.children.push(newNode.data)
-      newNode.parent=cloneroot;
-    })
-      
-     
-     // console.log("newnode after adding children")
-     // console.log(newNode)
-    
-    //j=0;
-    return cloneroot;
-  }else{
-   // console.log(cloneroot)
-  // j=0;
-    return cloneroot;
-
+  // Assigns the x and y position for the nodes
+  var treeData = treemap(root);
+  //console.log(treeData)
+  // Compute the new tree layout.
+  var nodes = treeData.descendants(),
+    links = treeData.descendants().slice(1);
+    nodes.forEach(function(d){
+      if (d.parent!=null){
+    d.depth = d.parent.depth+1 
+    d.height=d.parent.height-1;
   }
-} 
-function clonenode(node, isleaf, depth, height){
-  var newNode = {
-     
-      name: node.data.name,
-      
-    };
+  });
+  // Normalize for fixed-depth.
+  nodes.forEach(function(d){
+    d.y = d.depth * 180
+  });
 
-    //Creates a Node from newNode object using d3.hierarchy(.)
-    var newNode = d3.hierarchy(newNode);
-    newNode.depth = depth
-    newNode.height = height
-    newNode.id=node.id
-    newNode.x=node.x;
-    newNode.y=node.y;
-    newNode.x0=node.x0;
-    newNode.y0=node.y0;
-    //newNode.height = root.height - 1
-    if(!isleaf){
-      newNode.children=[];
-      newNode.data.children=[];
-    }
-   
-    return newNode;
+  // ### LINKS
+
+  // Update the links...
+  var link = svg.selectAll('line.link').
+    data(links, function(d) {
+      return d.id;
+    });
+
+  // Enter any new links at the parent's previous position.
+  var linkEnter = link.enter().
+    append('line').
+    attr("class", "link").
+    attr("stroke-width", 2).
+    attr("stroke", 'black').
+    attr('x1', function(d) {
+      return source.x0;
+    }).
+    attr('y1', function(d) {
+      return source.y0;
+    }).
+    attr('x2', function(d) {
+      return source.x0;
+    }).
+    attr('y2', function(d) {
+      return source.y0;
+    })
+    
+  var linkUpdate = linkEnter.merge(link);
+  
+  linkUpdate.transition().
+    duration(duration).
+    attr('x1', function(d) {
+      return d.parent.x;
+    }).
+    attr('y1', function(d) {
+      return d.parent.y;
+    }).
+    attr('x2', function(d) {
+      return d.x;
+    }).
+    attr('y2', function(d) {
+      return d.y;
+    });
+
+  // Transition back to the parent element position
+  linkUpdate.transition().
+    duration(duration).
+    attr('x1', function(d) {
+      return d.parent.x;
+    }).
+    attr('y1', function(d) {
+      return d.parent.y;
+    }).
+    attr('x2', function(d) {
+      return d.x;
+    }).
+    attr('y2', function(d) {
+      return d.y;
+    });
+
+  // Remove any exiting links
+  var linkExit = link.exit().
+    transition().
+    duration(duration).
+    attr('x1', function(d) {
+      return source.x;
+    }).
+    attr('y1', function(d) {
+      return source.y;
+    }).
+    attr('x2', function(d) {
+      return source.x;
+    }).
+    attr('y2', function(d) {
+      return source.y;
+    }).
+    remove();
+
+  // ### CIRCLES
+
+  // Update the nodes...
+    node = svg.selectAll('g.node')
+    .data(nodes, function(d) {
+      return d.id || (d.id = ++i);
+    });
+
+  // Enter any new modes at the parent's previous position.
+  var nodeEnter = node.enter().
+    append('g').
+    attr('class', 'node').
+    attr("transform", function(d) {
+      return "translate(" + source.x0 + "," + source.y0 + ")";
+    }).call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended));
+
+  // Add Circle for the nodes
+  nodeEnter.append('circle').
+    attr('class', 'node').
+    attr('r', 10).
+    style("fill", function(d) {
+      return "#0e4677";
+    });
+    nodeEnter.append("text")
+      .attr("dx", ".60em")
+      .attr("x", function(d) { return d.children ? -30 : 30; })
+      .style("text-anchor", "middle")
+      .text(function(d) { return d.data.name; });
+  // Update
+  var nodeUpdate = nodeEnter.merge(node);
+
+  // Transition to the proper position for the node
+  nodeUpdate.transition().
+    duration(duration).
+    attr("transform", function(d) {
+      return "translate(" + d.x + "," + d.y + ")";
+    });
+
+  // Update the node attributes and style
+  nodeUpdate.select('circle.node').
+    attr('r', 10).
+    style("fill", function(d) {
+      return "#0e4677";
+    }).
+    attr('cursor', 'pointer');
+
+  // Remove any exiting nodes
+  var nodeExit = node.exit().
+    transition().
+    duration(duration).
+    attr("transform", function(d) {
+      return "translate(" + source.x + "," + source.y + ")";
+    }).
+    remove();
+
+  // On exit reduce the node circles size to 0
+  nodeExit.select('circle').attr('r', 0);
+  
+  // Store the old positions for transition.
+  nodes.forEach(function(d){
+    d.x0 = d.x;
+    d.y0 = d.y;
+  }); 
 }
-
 
 
 var originalX=null;
@@ -278,7 +388,7 @@ var originalY=null;
 var permchanges=[];
 
 
-permchanges.push(clonetree(root,root.depth,root.height))
+/*permchanges.push(clonetree(root,root.depth,root.height))
 $(function() {
  $("#undobutton").click(function(){
   if (permchanges.length<=1){
@@ -298,39 +408,34 @@ $(function() {
       updatealltext();
   }          
 })
-})
+})*/
 
 
 var clicked= false;
 function dragstarted(d) {
    clicked = false;
   draggingNode = d;
+  
+  var copy = clone(this).attr("class", "copys");
+  //creating shadowi image of dragging node
   d3.select(this).raise().classed("active", true);
-  copynode=d3.select("g").append("circle").attr("class", "copys")
-                    .attr('r', 10)
-                    .style("fill", function(d) {
-                          return "#0e4677";
-                        })
-                    .style("stroke","steelblue")
-                    .style("stroke-width","3px")
-                    .attr("cx",draggingNode.y)
-                    .attr("cy",draggingNode.x)
-  originalX=draggingNode.y;
-  originalY=draggingNode.x;
-
-       //creating shadowi image of dragging node
-  d3.select(this).append("circle")
-    .attr('r', 10).attr("opacity", 0.9).style("fill","#b0c4de")  
+  d3.select(this).style("opacity",0.4)  
   dragStarted = null;
 }
 
 function dragged(d) {
   //d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
   //draggingNode=d;
-
-  d.y += d3.event.dx
-  d.x += d3.event.dy
-  d3.select(this).attr("transform", "translate(" + d.y + "," + d.x + ")");
+  if (chosenlayout=="horizontal"){
+    d.y += d3.event.dx
+    d.x += d3.event.dy
+    d3.select(this).attr("transform", "translate(" + d.y + "," + d.x + ")");
+  }else if (chosenlayout=="vertical"){
+    d.y += d3.event.dy
+    d.x += d3.event.dx
+    d3.select(this).attr("transform", "translate(" + d.x + "," + d.y + ")");
+  }
+  
 }
 function dragended(d) {
   var touchedNode=false;
@@ -471,11 +576,12 @@ function dragended(d) {
             duration=500;
             if (draggingNode.parent!=d && d.parent!=draggingNode){//different level different branch    
                 mergeNodes(draggingNode,d,root) 
-                     
+                 update(d,svg,root)    
                 permchanges.push(clonetree(root,root.depth,root.height))      
                       
             }else if(draggingNode.parent==d){
                 mergeNodes(draggingNode,d,root) 
+                update(d,svg,root)
                  permchanges.push(clonetree(root,root.depth,root.height))
             }else if (draggingNode==d.parent){
               if (typeof d.children !='undefined')
@@ -517,7 +623,7 @@ function dragended(d) {
                 var dC=findNode(rootC,d)
               //  console.log(dC)
                 mergeNodes(draggingNodeC,dC,rootC) 
-
+                update(dC,svg,rootC)
             }else if(draggingNode.parent==d){
               rootC=clonetree(root,root.depth,root.height)
                //console.log(rootC)
@@ -526,6 +632,7 @@ function dragended(d) {
                 var dC=findNode(rootC,d)
                // console.log(dC)
                 mergeNodes(draggingNodeC,dC,rootC)
+                update(dC,svg,rootC)
 
             }else if (draggingNode==d.parent){
               rootC=clonetree(root,root.depth,root.height)
@@ -654,6 +761,62 @@ function dragended(d) {
 }
 
 
+
+});
 function windowClose(){
   d3.select("body").selectAll("div.dialogbox").style("display", "none")
+}
+function clonetree(root, depth, height){
+
+  var cloneroot=clonenode(root, typeof root.children=='undefined', depth, height)
+ 
+
+  if (typeof root.children!='undefined'){
+   // console.log("entered here")
+ 
+    root.children.forEach(function(f){
+      var newNode=clonetree(f, depth + 1, height - 1)
+     //console.log("newnode")
+     //console.log(newNode)
+      cloneroot.children.push(newNode)
+      cloneroot.data.children.push(newNode.data)
+      newNode.parent=cloneroot;
+    })
+      
+     
+     // console.log("newnode after adding children")
+     // console.log(newNode)
+    
+    //j=0;
+    return cloneroot;
+  }else{
+   // console.log(cloneroot)
+  // j=0;
+    return cloneroot;
+
+  }
+} 
+function clonenode(node, isleaf, depth, height){
+  var newNode = {
+     
+      name: node.data.name,
+      
+    };
+
+    //Creates a Node from newNode object using d3.hierarchy(.)
+    var newNode = d3.hierarchy(newNode);
+    newNode.depth = depth
+    newNode.height = height
+    newNode.id=node.id
+    newNode.x=node.x;
+    newNode.y=node.y;
+    newNode.x0=node.x0;
+    newNode.y0=node.y0;
+    //newNode.height = root.height - 1
+    if(!isleaf){
+      newNode.children=[];
+      newNode.data.children=[];
+    }
+   
+    return newNode;
 }

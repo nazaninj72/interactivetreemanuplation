@@ -16,69 +16,36 @@
   stroke: #ccc;
   stroke-width: 2px;
 }
- ui-button {
-   background:#b9cd6d;
-   border: 2px solid #b9cd6d;
-   color: #FFFFFF;
-   font-weight: bold;
+.copys circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 3px;
 }
-.ui-widget {
-    font-family: Verdana,Arial,sans-serif;
-    font-size: .8em;
+.copys text {
+  font: 12px sans-serif;
 }
 
-.ui-widget-content {
-    background: #F9F9F9;
-    border: 1px solid #90d93f;
-    color: #222222;
-}
-
-.ui-dialog {
-    left: 0;
-    outline: 0 none;
-    padding: 0 !important;
-    top: 0;
-}
-.ui-dialog .ui-dialog-content {
-    background: none repeat scroll 0 0 transparent;
-    border: 0 none;
-    overflow: auto;
-    position: relative;
-    padding: 0 !important;
-}
-
-.ui-widget-header {
-    background: #b0de78;
-    border: 0;
-    color: #fff;
-    font-weight: normal;
-}
-
-.ui-dialog .ui-dialog-titlebar {
-    padding: 0.1em .5em;
-    position: relative;
-    font-size: 1em;
-}
-.ui-button-text {
-   font-size: inherit !important;
-}
-.small-button {
-   font-size: .8em !important;
-}
 .container {
     width: 100%;
-    height: 600px;
+    height: 100%;
     margin: auto;
     padding: 10px;
 }
+.layouttoolbar {
+  width: 100%;
+  height: 100px;
+   float: left;
+  border-collapse: collapse;
+  background-color: #4da6ff;
+}
 .tree {
     width: 75%;
-    height: 600px;
+    height: 100%;
     float: left;
 }
 .recomwindow {
     width: 25%;
-    height: 600px;
+    height: 100%;
     float: right;
 }
 .dialogbox {
@@ -156,3 +123,21 @@
   margin: 4px 2px;
   cursor: pointer;
 }
+ul {
+    list-style-type: none;
+    width: 230px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.li {
+  height: 25px;
+    float: left;
+    border-right:1px solid #bbb;
+}
+
+.li:last-child {
+    border-right: none;
+}
+
