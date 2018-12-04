@@ -22,7 +22,7 @@ function duplicatebranches(g,k){
          if (typeof copysubtree.children!='undefined'){
           copysubtree.children.forEach(function(f){
           f.parent=g;
-             if (typeof g.children !== 'undefined') {
+             if (typeof g.children != 'undefined') {
                   g.children.push(f);
               } else {
                   g.children=[];
@@ -34,17 +34,10 @@ function duplicatebranches(g,k){
          }
          
   
-   g.data.name= k.data.name+"&" + g.data.name;
+   g.data.name= k.data.name+"AND" + g.data.name;
 
   
    k.data.name= g.data.name;
- //  console.log("draggedNode.data.name")
- //  console.log(g.data.name)
-   updatealltext();
-   deshadownode();
-  // console.log(root);
-   
-  
 }
 function findNode(rootC,d){
   var nodes = rootC.descendants()
@@ -67,7 +60,7 @@ function findNode(rootC,d){
 }
 function deshadownode(){
   svg.selectAll('g.node').append("circle")
-        .attr('r', 10).style("fill", function(d) {
+        .attr('r', 10).style("opacity",1.0).style("fill", function(d) {
         return "#0e4677";
        })
 }
@@ -108,12 +101,18 @@ function addtochildren(d,f){
 } 
 function updatealltext(){
   svg.selectAll('g.node').select("text").text(function(d) { return d.data.name; });
+  svg.selectAll('g.node').select('circle').attr("id", function(d){return d.data.name+d.id})
+  svg.selectAll('line.link').attr("id", function(d){return d.data.name+d.id+"link"})
+  //console.log(svg.selectAll('g.node').select('circle'))
 
 }
 function removelink(draggedNode){
+  console.log("draggedNode")
+  console.log(draggedNode)
   svg.selectAll('line.link').filter(function(d, i) { 
-    if(d == draggedNode)
-    { return true;}
+    if(d.id == draggedNode.id)
+    { console.log(d)
+      return true;}
       return false;
     }).remove()
 }
@@ -219,7 +218,7 @@ function mergeNodes(draggedNode,d,root){
      }
               //console.log(f.parent.children.length)
                
-       d.data.name= d.data.name+"&" + draggedNode.data.name;
+       d.data.name= d.data.name+"AND" + draggedNode.data.name;
        
        updatealltext()
        
@@ -229,7 +228,6 @@ function mergeNodes(draggedNode,d,root){
        
        removedraggedNode(draggedNode)
 }
-
 function updateids(root){
   var nodez=root.descendants();
   var j  = 0;
@@ -237,3 +235,40 @@ function updateids(root){
     return f.id=++j;
   })
 }
+function removeTempChanges(dragedC,dC,draggedNodechildren,dchildren,svg){
+  
+  console.log(dchildren)
+  svg.selectAll('g.node').filter(function(h,i){
+    if (h.parent==dragedC){
+      console.log("h")
+      console.log(h)
+      var found=false;
+      dchildren.forEach(function(f){
+
+        if (f.id==h.id){
+         
+          found=true;
+        }
+      })
+      return found;
+    
+    }else{
+      return false;
+    }
+    
+  }).remove();
+
+}
+
+function centerNode(source,k,width,height) {
+        k = d3.event.transform.k;
+        x = -source.y0;
+        y = -source.x0;
+        x = x * k + width / 2;
+        y = y * k + height / 2;
+        d3.select('g').transition()
+            .duration(duration)
+            .attr("transform", "translate(" + x + "," + y + ")scale(" + k + ")");
+        zoomListener.scale(scale);
+        zoomListener.translate([x, y]);
+    }

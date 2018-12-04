@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="styles.css">
+<script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>   
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.2/d3.min.js"></script>
+<script src="https://d3js.org/d3-path.v1.min.js"></script>
+<script src="https://d3js.org/d3-shape.v1.min.js"></script>
+<script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+
+<body>
+  <div class="container">
+    <div class="recomwindow" id="recom_container">
+
+      <div class="dialogbox" id="dialogbox1" > 
+        <div class="dialogtitle" id="dTitle"> How to interact nodes?
+          <input type="button" class ="xbutton" id="xbutton" value="X" onclick="windowClose();"></div> 
+        <div class ="dialogbody" id="dBody">
+          <button type="button" class="choice" id="duplicatenodes" ">Copy node in each branch</button>
+          <button type="button" class="choice" id="mergenodes" ">Merge with this node in dropping point</button>
+        </div>
+        
+      </div>
+      <div class="dialogbox" id="dialogbox2" > 
+        <div class="dialogtitle" id="dTitle"> How to interact nodes?
+          <input type="button" class ="xbutton" id="xbutton2" value="X" onclick="windowClose();"></div> 
+        <div class ="dialogbody" id="dBody">
+          <button type="button" class="choice" id="mergenodes2" ">Merge with this node in dropping point</button>
+        </div>
+        
+      </div>
+      <div class="dialogbox" id="dialogbox3" > 
+        <div class="dialogtitle" id="dTitle"> How to interact node and link?
+          <input type="button" class ="xbutton" id="xbutton3" value="X" onclick="windowClose();"></div> 
+        <div class ="dialogbody" id="dBody">
+          <button type="button" class="choice" id="addtomiddle" ">Add in between two nodes</button>
+          <button type="button" class="choice" id="addtochildren" ">Add to children of nodes</button>
+        </div>
+        
+      </div>
+    </div>
+    <div class="tree" id= "tree_container"> 
+
+      
+      <script async  src="tmain.js"></script>
+      <script src="functions.js"></script>
+      <ul>
+        <li><a  href="index.html">Horizontal</a></li>
+        <li><a href="vertical.html">Vertical</a></li>
+        <li><a class="active" href="Indented.html">Indented</a></li>
+      </ul>
+    </div>
+
+    
+    
+
+    <!--  <div id="undooption">
+      <input type="button" id="undobutton" value="undo">
+    </div> -->
+  </div>
+  
+
+</body>
